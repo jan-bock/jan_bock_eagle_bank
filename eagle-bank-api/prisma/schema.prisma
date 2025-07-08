@@ -1,0 +1,26 @@
+// Prisma schema for PostgreSQL
+// Run `npx prisma migrate dev` after editing
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id               String   @id @default(uuid())
+  name             String
+  addressLine1     String
+  addressLine2     String?
+  addressLine3     String?
+  town             String
+  county           String
+  postcode         String
+  phoneNumber      String
+  email            String   @unique
+  createdTimestamp DateTime @default(now())
+  updatedTimestamp DateTime @updatedAt
+}
