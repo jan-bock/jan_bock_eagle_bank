@@ -26,6 +26,7 @@ model User {
   updatedTimestamp DateTime @updatedAt
 
   bankAccounts      BankAccount[]
+  transactions       Transaction[]
 }
 
 model BankAccount {
@@ -40,6 +41,21 @@ model BankAccount {
   updatedTimestamp DateTime @updatedAt
 
   user             User     @relation(fields: [userId], references: [id])
+  transactions      Transaction[]
+}
+
+model Transaction {
+  id               String      @id @default(dbgenerated("concat('tan-', substr(md5(random()::text), 1, 6))"))
+  accountNumber    String
+  userId           String
+  type             String      // "deposit" or "withdrawal"
+  amount           Float
+  currency         String      // "GBP"
+  reference        String?
+  createdTimestamp DateTime    @default(now())
+
+  account          BankAccount @relation(fields: [accountNumber], references: [accountNumber])
+  user             User        @relation(fields: [userId], references: [id])
 }
 
 // Add sequence for account numbers (migration step)
