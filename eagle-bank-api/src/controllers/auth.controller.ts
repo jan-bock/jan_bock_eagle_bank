@@ -11,16 +11,24 @@ export const loginUser = async (req: Request, res: Response) => {
     let token: string | null = null;
     try {
       token = await loginUserService(email, password);
-    } catch (err: any) {
-      console.error('Error in loginUserService:', err);
+    } catch (err: unknown) {
+      if (err instanceof Error) {
+        console.error('Error in loginUserService:', err.message);
+      } else {
+        console.error('Error in loginUserService:', err);
+      }
       return res.status(500).json({ message: 'An unexpected error occurred.' });
     }
     if (!token) {
       return res.status(401).json({ message: 'Invalid email or password.' });
     }
     res.status(200).json({ token });
-  } catch (err: any) {
-    console.error('Error in loginUser controller:', err);
+  } catch (err: unknown) {
+    if (err instanceof Error) {
+      console.error('Error in loginUser controller:', err.message);
+    } else {
+      console.error('Error in loginUser controller:', err);
+    }
     return res.status(500).json({ message: 'An unexpected error occurred.' });
   }
 };
