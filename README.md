@@ -1,6 +1,6 @@
-# Eagle Bank API
+# 🦅 **Eagle Bank API**
 
-## Technologies Used
+## **Technologies Used**
 
 - **Node.js** & **Express** – REST API server
 - **TypeScript** – Type safety and maintainability
@@ -13,15 +13,15 @@
 
 ---
 
-## Implemented Endpoints & User Stories
+## **Implemented Endpoints & User Stories**
 
-### Authentication
+### 🔐 **Authentication**
 - **POST /v1/auth/login**  
   - Authenticate a user and return a JWT token  
   - JWT required for all endpoints except user creation  
   - OpenAPI spec updated
 
-### User Management
+### **User Management**
 - **POST /v1/users**  
   - Create a new user (with validation and duplicate email check)
 - **GET /v1/users/{userId}**  
@@ -29,7 +29,7 @@
   - Forbidden when accessing another user's data
   - 404 for non-existent user
 
-### Bank Accounts
+### 🏦 **Bank Accounts**
 - **POST /v1/accounts**  
   - Create a new bank account (JWT required)
   - Validation for required fields
@@ -39,7 +39,7 @@
   - 403 for another user's account
   - 404 for non-existent account
 
-### Transactions
+### **Transactions**
 - **POST /v1/accounts/{accountNumber}/transactions**  
   - Deposit/withdrawal (JWT required, only for own account)
   - Balance updated atomically
@@ -54,14 +54,14 @@
 
 ---
 
-## Test Coverage
+## **Test Coverage**
 
 - All endpoints and edge/error cases are covered by integration tests.
 - Tests ensure compliance with the OpenAPI specification.
 
 ---
 
-## OpenAPI Spec
+## **OpenAPI Spec**
 
 - All endpoints, request/response schemas, and error cases are documented in `openapi.yaml`.
 - JWT Bearer authentication is specified and enforced.
