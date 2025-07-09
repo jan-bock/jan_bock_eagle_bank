@@ -1,6 +1,7 @@
 // Handles the request logic
 import { Request, Response, NextFunction } from 'express';
 import { createUserService } from '../services/user.service';
+import prisma from '../config/db';
 
 export const createUser = async (req: Request, res: Response, next: NextFunction) => {
   try {
@@ -39,6 +40,91 @@ export const createUser = async (req: Request, res: Response, next: NextFunction
       });
     }
     // Unexpected error
+    return res.status(500).json({ message: 'An unexpected error occurred.' });
+  }
+};
+
+export const getUserById = async (req: Request, res: Response) => {
+  const user = await prisma.user.findUnique({ where: { id: req.params.userId } });
+  if (!user) {
+    return res.status(404).json({ message: 'User was not found' });
+  }
+  const userResponse = {
+    id: user.id,
+    name: user.name,
+    address: {
+      line1: user.addressLine1,
+      line2: user.addressLine2,
+      line3: user.addressLine3,
+      town: user.town,
+      county: user.county,
+      postcode: user.postcode,
+    },
+    phoneNumber: user.phoneNumber,
+    email: user.email,
+    createdTimestamp: user.createdTimestamp,
+    updatedTimestamp: user.updatedTimestamp,
+  };
+  res.status(200).json(userResponse);
+};
+
+export const updateUserById = async (req: Request, res: Response) => {
+  try {
+    const user = await prisma.user.update({
+      where: { id: req.params.userId },
+      data: {
+        ...req.body.name && { name: req.body.name },
+        ...req.body.address && {
+          addressLine1: req.body.address.line1,
+          addressLine2: req.body.address.line2,
+          addressLine3: req.body.address.line3,
+          town: req.body.address.town,
+          county: req.body.address.county,
+          postcode: req.body.address.postcode,
+        },
+        ...req.body.phoneNumber && { phoneNumber: req.body.phoneNumber },
+        ...req.body.email && { email: req.body.email },
+      },
+    });
+    const userResponse = {
+      id: user.id,
+      name: user.name,
+      address: {
+        line1: user.addressLine1,
+        line2: user.addressLine2,
+        line3: user.addressLine3,
+        town: user.town,
+        county: user.county,
+        postcode: user.postcode,
+      },
+      phoneNumber: user.phoneNumber,
+      email: user.email,
+      createdTimestamp: user.createdTimestamp,
+      updatedTimestamp: user.updatedTimestamp,
+    };
+    res.status(200).json(userResponse);
+  } catch (err: any) {
+    if (err.code === 'P2025') {
+      return res.status(404).json({ message: 'User was not found' });
+    }
+    if (err.code === 'P2002' && err.meta?.target?.includes('email')) {
+      return res.status(400).json({
+        message: 'A user with this email already exists.',
+        details: [{ field: 'email', message: 'Email must be unique', type: 'unique' }]
+      });
+    }
+    return res.status(500).json({ message: 'An unexpected error occurred.' });
+  }
+};
+
+export const deleteUserById = async (req: Request, res: Response) => {
+  try {
+    await prisma.user.delete({ where: { id: req.params.userId } });
+    res.status(204).send();
+  } catch (err: any) {
+    if (err.code === 'P2025') {
+      return res.status(404).json({ message: 'User was not found' });
+    }
     return res.status(500).json({ message: 'An unexpected error occurred.' });
   }
 };

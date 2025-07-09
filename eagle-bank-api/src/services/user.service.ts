@@ -1,5 +1,6 @@
 // Business logic (e.g., save user)
 import prisma from '../config/db';
+import bcrypt from 'bcrypt';
 
 export type CreateUserInput = {
   name: string;
@@ -13,9 +14,12 @@ export type CreateUserInput = {
   };
   phoneNumber: string;
   email: string;
+  password: string;
 };
 
 export const createUserService = async (userData: CreateUserInput) => {
+  const passwordHash = await bcrypt.hash(userData.password, 10);
+  console.log('Creating user:', userData.email, 'passwordHash:', passwordHash);
   const user = await prisma.user.create({
     data: {
       name: userData.name,
@@ -27,7 +31,9 @@ export const createUserService = async (userData: CreateUserInput) => {
       postcode: userData.address.postcode,
       phoneNumber: userData.phoneNumber,
       email: userData.email,
+      passwordHash,
     },
   });
+  console.log('User created:', user.email, 'id:', user.id);
   return user;
 };

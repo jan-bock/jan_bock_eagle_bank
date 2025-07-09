@@ -617,6 +617,46 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/ErrorResponse"
+  /v1/auth/login:
+    post:
+      tags:
+        - user
+      summary: Authenticate a user and return a JWT
+      description: |-
+        Authenticate a user with email and password. Returns a JWT token to be used as a Bearer token for all protected endpoints.
+      operationId: loginUser
+      requestBody:
+        description: User login credentials
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/LoginRequest'
+      responses:
+        '200':
+          description: Successfully authenticated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/LoginResponse'
+        '400':
+          description: Invalid credentials supplied
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BadRequestErrorResponse'
+        '401':
+          description: Authentication failed
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '500':
+          description: An unexpected error occurred
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
 components:
   schemas:
     CreateBankAccountRequest:
@@ -783,6 +823,7 @@ components:
         - address
         - phoneNumber
         - email
+        - password
       properties:
         name:
           type: string
@@ -813,7 +854,12 @@ components:
           format: ^\+[1-9]\d{1,14}$
         email:
           type: string
-          format: email    
+          format: email
+        password:
+          type: string
+          format: password
+          minLength: 8
+          description: User password (min 8 chars)
     UpdateUserRequest:
       type: object
       properties:
@@ -927,6 +973,26 @@ components:
                 type: string
               type:
                 type: string
+    LoginRequest:
+      type: object
+      required:
+        - email
+        - password
+      properties:
+        email:
+          type: string
+          format: email
+        password:
+          type: string
+          format: password
+    LoginResponse:
+      type: object
+      required:
+        - token
+      properties:
+        token:
+          type: string
+          description: JWT access token
   securitySchemes:
     bearerAuth:
       type: http

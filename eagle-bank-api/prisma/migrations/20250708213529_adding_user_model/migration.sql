@@ -18,3 +18,12 @@ CREATE TABLE "User" (
 
 -- CreateIndex
 CREATE UNIQUE INDEX "User_email_key" ON "User"("email");
+
+-- Create the sequence if it doesn't exist
+DO $$
+BEGIN
+    IF NOT EXISTS (SELECT 1 FROM pg_class WHERE relkind = 'S' AND relname = 'account_number_seq') THEN
+        CREATE SEQUENCE account_number_seq START 100000;
+    END IF;
+END
+$$;

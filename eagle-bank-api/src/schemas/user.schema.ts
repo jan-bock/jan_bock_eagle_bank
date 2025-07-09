@@ -13,4 +13,5 @@ export const userSchema = object({
   }).required(),
   phoneNumber: string().required(),
   email: string().email().required(),
+  password: string().min(8, 'Password must be at least 8 characters').required(),
 });
