@@ -1,0 +1,62 @@
+// Prisma schema for PostgreSQL
+// Run `npx prisma migrate dev` after editing
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id               String   @id @default(uuid())
+  name             String
+  addressLine1     String
+  addressLine2     String?
+  addressLine3     String?
+  town             String
+  county           String
+  postcode         String
+  phoneNumber      String
+  email            String   @unique
+  passwordHash     String?
+  createdTimestamp DateTime @default(now())
+  updatedTimestamp DateTime @updatedAt
+
+  bankAccounts      BankAccount[]
+  transactions       Transaction[]
+}
+
+model BankAccount {
+  accountNumber     String   @id @default(dbgenerated("'01' || lpad(nextval('account_number_seq')::text, 6, '0')"))
+  sortCode         String   @default("10-10-10")
+  name             String
+  accountType      String
+  balance          Float    @default(0.0)
+  currency         String   @default("GBP")
+  userId           String
+  createdTimestamp DateTime @default(now())
+  updatedTimestamp DateTime @updatedAt
+
+  user             User     @relation(fields: [userId], references: [id])
+  transactions      Transaction[]
+}
+
+model Transaction {
+  id               String      @id @default(dbgenerated("concat('tan-', substr(md5(random()::text), 1, 6))"))
+  accountNumber    String
+  userId           String
+  type             String      // "deposit" or "withdrawal"
+  amount           Float
+  currency         String      // "GBP"
+  reference        String?
+  createdTimestamp DateTime    @default(now())
+
+  account          BankAccount @relation(fields: [accountNumber], references: [accountNumber])
+  user             User        @relation(fields: [userId], references: [id])
+}
+
+// Add sequence for account numbers (migration step)
+// CREATE SEQUENCE account_number_seq START 100000;
