@@ -1,6 +1,7 @@
 // Controller for POST /v1/accounts
 import { Request, Response } from 'express';
 import { createBankAccountService } from '../services/account.service';
+import prisma from '../config/db';
 
 export const createAccount = async (req: Request, res: Response) => {
   try {
@@ -26,4 +27,29 @@ export const createAccount = async (req: Request, res: Response) => {
     }
     return res.status(500).json({ message: 'An unexpected error occurred.' });
   }
+};
+
+export const getAccountByAccountNumber = async (req: Request, res: Response) => {
+  const userId = (req as any).user?.userId;
+  const { accountNumber } = req.params;
+  // Find the account
+  const account = await prisma.bankAccount.findUnique({ where: { accountNumber } });
+  if (!account) {
+    return res.status(404).json({ message: 'Bank account was not found' });
+  }
+  if (account.userId !== userId) {
+    return res.status(403).json({ message: 'Forbidden: can only access your own bank account.' });
+  }
+  // Format response per OpenAPI
+  const response = {
+    accountNumber: account.accountNumber,
+    sortCode: account.sortCode,
+    name: account.name,
+    accountType: account.accountType,
+    balance: account.balance,
+    currency: account.currency,
+    createdTimestamp: account.createdTimestamp,
+    updatedTimestamp: account.updatedTimestamp,
+  };
+  res.status(200).json(response);
 };
