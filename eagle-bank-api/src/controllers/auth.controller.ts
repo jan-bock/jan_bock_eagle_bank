@@ -8,6 +8,7 @@ export const loginUser = async (req: Request, res: Response) => {
     if (!email || !password) {
       return res.status(400).json({ message: 'Email and password are required.' });
     }
+
     let token: string | null = null;
     try {
       token = await loginUserService(email, password);
@@ -17,6 +18,7 @@ export const loginUser = async (req: Request, res: Response) => {
       } else {
         console.error('Error in loginUserService:', err);
       }
+
       return res.status(500).json({ message: 'An unexpected error occurred.' });
     }
     if (!token) {
@@ -29,6 +31,7 @@ export const loginUser = async (req: Request, res: Response) => {
     } else {
       console.error('Error in loginUser controller:', err);
     }
+    
     return res.status(500).json({ message: 'An unexpected error occurred.' });
   }
 };
