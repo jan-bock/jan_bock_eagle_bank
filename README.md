@@ -68,16 +68,28 @@
 
 ---
 
-## How to Run
+## 🛠️ **How to Run**
 
-1. Install dependencies:  
-   `npm install`
-2. Set up your `.env` file (see `.env.example`)
-3. Run migrations:  
-   `npx prisma migrate dev`
-4. Start the server:  
-   `npm run dev`
-5. Run tests:  
-   `npx vitest run`
+1. **Install dependencies:**  
+   ```sh
+   npm install
+   ```
+2. **Set up your `.env` file** (see `.env.example`)
+3. **Run migrations:**  
+   ```sh
+   npx prisma migrate dev
+   ```
+4. **Build the app:**  
+   ```sh
+   npm run build
+   ```
+5. **Start the server:**  
+   ```sh
+   npm run dev
+   ```
+6. **Run tests:**  
+   ```sh
+   npx vitest run
+   ```
 
 ---

@@ -6,7 +6,8 @@
     "start": "ts-node src/server.ts",
     "dev": "nodemon src/server.ts",
     "test": "vitest run",
-    "test:ui": "vitest --ui"
+    "test:ui": "vitest --ui",
+    "build": "tsc"
   },
   "dependencies": {
     "@prisma/client": "^5.22.0",
