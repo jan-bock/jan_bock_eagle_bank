@@ -8,7 +8,7 @@ const validate = (schema: AnySchema) => async (req: Request, res: Response, next
     next();
   } catch (err: unknown) {
     let details: string[] = [];
-    if (err && typeof err === 'object' && 'errors' in err && Array.isArray((err as any).errors)) {
+    if (err && typeof err === 'object' && 'errors' in err && Array.isArray((err).errors)) {
       details = (err as { errors: string[] }).errors;
     }
     console.log('Validation error:', err);

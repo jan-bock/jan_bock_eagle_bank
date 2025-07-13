@@ -80,7 +80,7 @@ export const createTransaction = async (req: AuthRequest, res: Response) => {
       type: transaction.type,
       reference: transaction.reference,
       userId: transaction.userId,
-      createdTimestamp: transaction.createdAt,
+      createdTimestamp: transaction.createdTimestamp,
     };
     res.status(201).json(response);
   } catch (err: unknown) {
