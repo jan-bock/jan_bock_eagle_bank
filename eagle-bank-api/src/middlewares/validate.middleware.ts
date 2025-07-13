@@ -11,6 +11,7 @@ const validate = (schema: AnySchema) => async (req: Request, res: Response, next
     if (err && typeof err === 'object' && 'errors' in err && Array.isArray((err).errors)) {
       details = (err as { errors: string[] }).errors;
     }
+    
     console.log('Validation error:', err);
     console.log('Request body:', req.body);
     res.status(400).json({ message: 'Validation error', details });

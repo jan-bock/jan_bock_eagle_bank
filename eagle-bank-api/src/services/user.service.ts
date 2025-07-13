@@ -19,6 +19,7 @@ export type CreateUserInput = {
 
 export const createUserService = async (userData: CreateUserInput) => {
   const passwordHash = await bcrypt.hash(userData.password, 10);
+  
   const user = await prisma.user.create({
     data: {
       name: userData.name,

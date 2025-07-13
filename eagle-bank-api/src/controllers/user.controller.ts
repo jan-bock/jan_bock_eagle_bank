@@ -6,6 +6,7 @@ import prisma from '../config/db';
 export const createUser = async (req: Request, res: Response, next: NextFunction) => {
   try {
     const user = await createUserService(req.body);
+
     // Transform to match OpenAPI spec
     const userResponse = {
       id: user.id,
@@ -27,6 +28,7 @@ export const createUser = async (req: Request, res: Response, next: NextFunction
   } catch (err: unknown) {
     if (typeof err === 'object' && err !== null) {
       const error = err as { code?: string; meta: unknown, name?: string; errors?: unknown[] };
+
       // Prisma unique constraint violation (duplicate email)
       if (
         error.code === 'P2002' &&
@@ -37,6 +39,7 @@ export const createUser = async (req: Request, res: Response, next: NextFunction
           details: [{ field: 'email', message: 'Email must be unique', type: 'unique' }]
         });
       }
+
       // Yup validation error (if validation middleware missed it)
       if (error.name === 'ValidationError') {
         return res.status(400).json({
@@ -52,9 +55,11 @@ export const createUser = async (req: Request, res: Response, next: NextFunction
 
 export const getUserById = async (req: Request, res: Response) => {
   const user = await prisma.user.findUnique({ where: { id: req.params.userId } });
+
   if (!user) {
     return res.status(404).json({ message: 'User was not found' });
   }
+
   const userResponse = {
     id: user.id,
     name: user.name,
@@ -71,6 +76,7 @@ export const getUserById = async (req: Request, res: Response) => {
     createdTimestamp: user.createdTimestamp,
     updatedTimestamp: user.updatedTimestamp,
   };
+
   res.status(200).json(userResponse);
 };
 
@@ -92,6 +98,7 @@ export const updateUserById = async (req: Request, res: Response) => {
         ...req.body.email && { email: req.body.email },
       },
     });
+
     const userResponse = {
       id: user.id,
       name: user.name,
@@ -108,6 +115,7 @@ export const updateUserById = async (req: Request, res: Response) => {
       createdTimestamp: user.createdTimestamp,
       updatedTimestamp: user.updatedTimestamp,
     };
+    
     res.status(200).json(userResponse);
   } catch (err: unknown) {
     if (typeof err === 'object' && err !== null) {

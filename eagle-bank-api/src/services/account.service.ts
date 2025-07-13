@@ -12,6 +12,7 @@ export const createBankAccountService = async (data: CreateBankAccountInput) => 
   if (data.accountType !== 'personal') {
     throw { code: 400, message: 'Invalid accountType. Only "personal" is supported.' };
   }
+
   const account = await prisma.bankAccount.create({
     data: {
       name: data.name,
@@ -20,5 +21,6 @@ export const createBankAccountService = async (data: CreateBankAccountInput) => 
       // sortCode, currency, balance, accountNumber are defaulted by Prisma/Postgres
     },
   });
+  
   return account;
 };

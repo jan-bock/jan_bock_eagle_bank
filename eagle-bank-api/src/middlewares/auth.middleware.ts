@@ -13,6 +13,7 @@ export const authenticateJWT = (req: AuthRequest, res: Response, next: NextFunct
   if (!authHeader || !authHeader.startsWith('Bearer ')) {
     return res.status(401).json({ message: 'Access token is missing or invalid' });
   }
+  
   const token = authHeader.split(' ')[1];
   try {
     const payload = jwt.verify(token, JWT_SECRET) as { userId: string };

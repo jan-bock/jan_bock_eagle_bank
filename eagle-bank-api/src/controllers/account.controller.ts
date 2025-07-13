@@ -9,8 +9,10 @@ export const createAccount = async (req: AuthRequest, res: Response) => {
   try {
     const userId = req.user?.userId;
     if (!userId) return res.status(401).json({ message: 'Access token is missing or invalid' });
+    
     const { name, accountType } = req.body;
     const account = await createBankAccountService({ name, accountType, userId: userId! });
+
     // Format response per OpenAPI
     const response = {
       accountNumber: account.accountNumber,
@@ -26,6 +28,7 @@ export const createAccount = async (req: AuthRequest, res: Response) => {
   } catch (err: unknown) {
     if (typeof err === 'object' && err !== null && 'code' in err) {
       const error = err as { code?: number; message?: string };
+
       if (error.code === 400) {
         return res.status(400).json({ message: error.message, details: [] });
       }
@@ -37,14 +40,17 @@ export const createAccount = async (req: AuthRequest, res: Response) => {
 export const getAccountByAccountNumber = async (req: AuthRequest, res: Response) => {
   const userId = req.user?.userId;
   const { accountNumber } = req.params;
+
   // Find the account
   const account = await prisma.bankAccount.findUnique({ where: { accountNumber } });
   if (!account) {
     return res.status(404).json({ message: 'Bank account was not found' });
   }
+
   if (account.userId !== userId) {
     return res.status(403).json({ message: 'Forbidden: can only access your own bank account.' });
   }
+
   // Format response per OpenAPI
   const response = {
     accountNumber: account.accountNumber,
@@ -72,6 +78,7 @@ export const createTransaction = async (req: AuthRequest, res: Response) => {
       type,
       reference,
     });
+
     // Format response per OpenAPI
     const response = {
       id: transaction.id,
@@ -82,6 +89,7 @@ export const createTransaction = async (req: AuthRequest, res: Response) => {
       userId: transaction.userId,
       createdTimestamp: transaction.createdTimestamp,
     };
+
     res.status(201).json(response);
   } catch (err: unknown) {
     if (typeof err === 'object' && err !== null && 'code' in err) {
@@ -91,6 +99,7 @@ export const createTransaction = async (req: AuthRequest, res: Response) => {
       if (error.code === 404) return res.status(404).json({ message: error.message });
       if (error.code === 422) return res.status(422).json({ message: error.message });
     }
+
     return res.status(500).json({ message: 'An unexpected error occurred.' });
   }
 };
@@ -101,20 +110,25 @@ export const fetchTransaction = async (req: AuthRequest, res: Response) => {
     const { accountNumber, transactionId } = req.params;
     // Find the account
     const account = await prisma.bankAccount.findUnique({ where: { accountNumber } });
+
     if (!account) {
       return res.status(404).json({ message: 'Bank account was not found' });
     }
+
     if (account.userId !== userId) {
       return res.status(403).json({ message: 'Forbidden: can only access your own bank account.' });
     }
+
     // Find the transaction and ensure it is associated with the account
     const transaction = await prisma.transaction.findUnique({ where: { id: transactionId } });
     if (!transaction) {
       return res.status(404).json({ message: 'Transaction was not found' });
     }
+
     if (transaction.accountNumber !== accountNumber) {
       return res.status(404).json({ message: 'Transaction was not found' });
     }
+    
     // Format response per OpenAPI
     const response = {
       id: transaction.id,
