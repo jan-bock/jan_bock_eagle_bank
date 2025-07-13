@@ -26,9 +26,12 @@ export const createUser = async (req: Request, res: Response, next: NextFunction
     res.status(201).json(userResponse);
   } catch (err: unknown) {
     if (typeof err === 'object' && err !== null) {
-      const error = err as { code?: string; meta?: any; name?: string; errors?: any };
+      const error = err as { code?: string; meta: unknown, name?: string; errors?: unknown[] };
       // Prisma unique constraint violation (duplicate email)
-      if (error.code === 'P2002' && error.meta?.target?.includes('email')) {
+      if (
+        error.code === 'P2002' &&
+        (error.meta as { target?: string[] })?.target?.includes('email')
+      ) {
         return res.status(400).json({
           message: 'A user with this email already exists.',
           details: [{ field: 'email', message: 'Email must be unique', type: 'unique' }]
@@ -108,11 +111,14 @@ export const updateUserById = async (req: Request, res: Response) => {
     res.status(200).json(userResponse);
   } catch (err: unknown) {
     if (typeof err === 'object' && err !== null) {
-      const error = err as { code?: string; meta?: any };
+      const error = err as { code?: string; meta?: unknown };
       if (error.code === 'P2025') {
         return res.status(404).json({ message: 'User was not found' });
       }
-      if (error.code === 'P2002' && error.meta?.target?.includes('email')) {
+      if (
+        error.code === 'P2002' &&
+        ((error.meta as { target?: string[] })?.target?.includes('email'))
+      ) {
         return res.status(400).json({
           message: 'A user with this email already exists.',
           details: [{ field: 'email', message: 'Email must be unique', type: 'unique' }]
